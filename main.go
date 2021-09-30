@@ -44,8 +44,10 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	log.Println(params)
 
+	//convert string to integer and return
 	i, _ := strconv.Atoi(params["id"])
 	log.Println("check id type: ", reflect.TypeOf(i))
+
 	for _, book := range books {
 		if book.ID == i {
 			json.NewEncoder(w).Encode(&book)
@@ -54,11 +56,27 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func addBook(w http.ResponseWriter, r *http.Request) {
-	log.Println("add book")
+	var book Book
+
+	_ = json.NewDecoder(r.Body).Decode(&book)
+
+	books = append(books, book)
+	log.Println(books)
+	json.NewEncoder(w).Encode(books)
 }
 
 func updateBook(w http.ResponseWriter, r *http.Request) {
-	log.Println("Update book")
+	var book Book
+
+	json.NewDecoder(r.Body).Decode(&book)
+
+	for i, item := range books {
+		if item.ID == book.ID {
+			books[i] = book
+		}
+	}
+
+	json.NewEncoder(w).Encode(books)
 }
 
 func removeBook(w http.ResponseWriter, r *http.Request) {
